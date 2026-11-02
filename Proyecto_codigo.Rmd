@@ -1,0 +1,17 @@
+---
+title: "Proyecto_final_codigo"
+author: "Miriam Caballero Cervero"
+date: "2026-11-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Leer los datos
+
+```{r pressure, echo=FALSE}
+datos <- read.csv(/data/retractions.csv)
+```
+
