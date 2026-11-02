@@ -15,3 +15,15 @@ knitr::opts_chunk$set(echo = TRUE)
 datos <- read.csv("data/retractions.csv")
 ```
 
+## Análisis previo de los datos
+
+```{r}
+View(datos)
+head(datos)
+tail(datos)
+dim(datos)
+names(datos)
+str(datos)
+summary(datos)
+```
+
