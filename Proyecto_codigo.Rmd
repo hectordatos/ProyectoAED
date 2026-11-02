@@ -46,8 +46,14 @@ length(unique(datos$Subject)) #Tenemos 12575 disciplinas
 #Ahora calculamos las frecuencias absolutas para saber en qué disciplina nos conviene más centrarnos
 table(datos$Subject) 
 prop.table(table(datos$Subject))*100
-#Vemos que es en la categoría de Negocios, concretamente en Contabilidad
 
+#Aunque también podemos centrarnos en las 10 categorías más repetidas
+freq <- sort(table(datos$Subject), decreasing = TRUE)
+#y las representamos
+barplot(head(freq, 10),
+        las = 2,
+        main ="Top 10 disciplinas científicas",
+        col = "lightpink")
 
 ```
 
