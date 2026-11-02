@@ -49,10 +49,13 @@ prop.table(table(datos$Subject))*100
 
 #Aunque también podemos centrarnos en las 10 categorías más repetidas
 freq <- sort(table(datos$Subject), decreasing = TRUE)
-#y las representamos
+#y las representamos en horizaontal porque los nombres son largos
 barplot(head(freq, 10),
-        las = 2,
+        horiz = TRUE, 
+        las = 1,
+        cex.names = 0.2, 
         main ="Top 10 disciplinas científicas",
+        xlab = "Frecuencia",
         col = "lightpink")
 #también podemos ver cuáles son los países más frecuentes en datos absolutos
 paises <- sort(table(datos$Country), decreasing = TRUE)
