@@ -54,6 +54,14 @@ barplot(head(freq, 10),
         las = 2,
         main ="Top 10 disciplinas científicas",
         col = "lightpink")
+#también podemos ver cuáles son los países más frecuentes en datos absolutos
+paises <- sort(table(datos$Country), decreasing = TRUE)
+top10_paises <- head(paises, 10)
+#representamos los países
+barplot(head(top10_paises, 10),
+        las = 2,
+        main ="Top 10 países",
+        col = "lightblue")
 
 ```
 
