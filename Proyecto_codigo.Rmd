@@ -36,5 +36,8 @@ sum(duplicated(datos))
 #Analizamos ahora las variables categóricas
 table(datos$Subject) #Vemos las frecuencias por temática científica
 prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
+#Representamos los datos para visualizarlos mejor
+barplot(table(datos$Subject))
+barplot(table(datos$RetractionDate))
 ```
 
