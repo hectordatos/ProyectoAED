@@ -18,12 +18,14 @@ datos <- read.csv("data/retractions.csv")
 ## Análisis previo de los datos
 
 ```{r}
+#Análisis inicial
 View(datos)
 head(datos)
 tail(datos)
 dim(datos)
 names(datos)
 str(datos)
+#Resumen estadístico de los datos
 summary(datos)
 ```
 
