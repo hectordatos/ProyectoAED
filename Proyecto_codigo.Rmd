@@ -12,6 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Leer los datos
 
 ```{r pressure, echo=FALSE}
-datos <- read.csv(/data/retractions.csv)
+datos <- read.csv("data/retractions.csv")
 ```
 
