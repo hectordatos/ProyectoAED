@@ -23,6 +23,7 @@ View(datos)
 head(datos)
 tail(datos)
 dim(datos)
+#Nombres de las columnas
 names(datos)
 str(datos)
 #Resumen estadístico de los datos
@@ -39,5 +40,14 @@ prop.table(table(datos$Subject)) #tabla para saber qué temática científica es
 #Representamos los datos para visualizarlos mejor
 barplot(table(datos$Subject))
 barplot(table(datos$RetractionDate))
+#El plot sale muy denso, mejor nos centramos solo en una disciplina científica
+unique(datos$Subject)
+length(unique(datos$Subject)) #Tenemos 12575 disciplinas
+#Ahora calculamos las frecuencias absolutas para saber en qué disciplina nos conviene más centrarnos
+table(datos$Subject) 
+prop.table(table(datos$Subject))*100
+#Vemos que es en la categoría de Negocios, concretamente en Contabilidad
+
+
 ```
 
