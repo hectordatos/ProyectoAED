@@ -31,5 +31,7 @@ summary(datos)
 sum(is.na(datos)) #Total de NA
 colSums(is.na(datos)) #NA por columna 
 colMeans(is.na(datos))*100 #Porcentaje de NA
+#Comprobamos los valores duplicados
+sum(duplicated(datos))
 ```
 
