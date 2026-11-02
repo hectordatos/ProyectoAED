@@ -33,5 +33,8 @@ colSums(is.na(datos)) #NA por columna
 colMeans(is.na(datos))*100 #Porcentaje de NA
 #Comprobamos los valores duplicados
 sum(duplicated(datos))
+#Analizamos ahora las variables categóricas
+table(datos$Subject) #Vemos las frecuencias por temática científica
+prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
 ```
 
