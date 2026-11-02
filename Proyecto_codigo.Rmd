@@ -27,5 +27,9 @@ names(datos)
 str(datos)
 #Resumen estadístico de los datos
 summary(datos)
+#Comprobamos los valores que hemos perdido
+sum(is.na(datos)) #Total de NA
+colSums(is.na(datos)) #NA por columna 
+colMeans(is.na(datos))*100 #Porcentaje de NA
 ```
 
