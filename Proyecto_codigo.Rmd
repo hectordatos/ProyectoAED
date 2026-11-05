@@ -19,8 +19,8 @@ datos <- read.csv("data/retractions.csv")
 
 ## Análisis inicial
 
-```{r}
-View(datos)
+```{r tablas, echo=FALSE, warning=FALSE, message=FALSE}
+#View(datos)
 
 # head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
 head(datos)
@@ -46,7 +46,7 @@ summary(datos)
 
 ## Identificar valores perdidos y duplicados
 
-```{r}
+```{r valores_perdidos}
 # Valores perdidos
 sum(is.na(datos)) #Total de NA
 colSums(is.na(datos)) #NA por columna 
@@ -58,7 +58,7 @@ sum(duplicated(datos))
 
 ## Analizamos las variables categóricas
 
-```{r}
+```{r variables-categoricas}
 #table(datos$Subject) #Vemos las frecuencias por temática científica
 #prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
 #Representamos los datos para visualizarlos mejor
@@ -85,14 +85,14 @@ axis(1,
 
 ## Análisis de las disciplinas científicas
 
-```{r}
+```{r disciplinas-cientificas}
 # Número de disciplinas diferentes 
 unique(datos$Subject) 
 length(unique(datos$Subject)) # Tenemos 12575 disciplinas
 
 #Frecuencias absolutas y relativas 
-freq_subject <- table(datos$Subject) 
-freq_subject 
+freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
+knitr::kable(head(freq_subject, 10))
 
 #prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
 
@@ -113,7 +113,7 @@ barplot(top10_subject,
 
 ## Análisis de los países
 
-```{r}
+```{r paises}
 # Calculamos las frecuencias absolutas por país
 paises <- sort(table(datos$Country), decreasing = TRUE)
 
@@ -136,7 +136,7 @@ barplot(top10_paises,
 
 ## Análisis por continente
 
-```{r}
+```{r continentes}
 library(countrycode)
 library(dplyr)
 library(tidyr)
