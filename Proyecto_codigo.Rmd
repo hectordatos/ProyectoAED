@@ -189,18 +189,9 @@ autores_conteo <- datos %>%
 # Cálculo de valores atípicos (método IQR)
 q1 <- quantile(autores_conteo$num_articulos, 0.25)
 q3 <- quantile(autores_conteo$num_articulos, 0.75)
-iqr <- q3 - q1
+umbral_outlier <- q3 + 1.5 * (q3 - q1)
 
-umbral_outlier <- q3 + 1.5 * iqr
-
-# Filtrar los autores considerados outliers
+# Filtrar outliers (opcional, para ver la lista)
 outliers_autores <- autores_conteo %>%
   filter(num_articulos > umbral_outlier)
-outliers_autores
-
-
-
-
-  
-
 ```
