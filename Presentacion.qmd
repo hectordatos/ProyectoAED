@@ -6,6 +6,12 @@ format:
     theme: simple
     slide-number: true
     transition: slide
+execute: 
+  echo: false
+  message: false
+  fig-width: 11
+  fig-height: 6
+  out-width: "95%"
 editor: visual
 ---
 
