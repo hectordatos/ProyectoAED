@@ -1,0 +1,162 @@
+---
+title: "Análisis exploratorio de retractaciones científicas"
+author: "Miriam Caballero Cerveró"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    transition: slide
+execute: 
+  echo: false
+  message: false
+  fig-width: 11
+  fig-height: 6
+  out-width: "95%"
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Leer los datos
+
+```{r carga-datos}
+datos <- read.csv("data/retractions.csv")
+```
+
+# Análisis previo de los datos
+
+## Análisis inicial
+
+```{r tablas}
+#View(datos)
+
+# head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
+head(datos)
+
+# tail(datos): Muestra las últimas 6 filas para comprobar que el archivo cargó completo y sin errores
+tail(datos) 
+
+# dim(datos): devuelve el número de filas y columnas del dataframe.
+dim(datos)
+
+# Nombres de las columnas(nombre de las variables)
+names(datos)
+
+# Número de valores distintos de cada variable
+sapply(datos, function(x) length(unique(x)))
+
+# str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
+str(datos)  
+
+# summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
+summary(datos)
+```
+
+## Identificar valores perdidos y duplicados
+
+```{r valores_perdidos}
+# Valores perdidos
+sum(is.na(datos)) #Total de NA
+colSums(is.na(datos)) #NA por columna 
+colMeans(is.na(datos))*100 #Porcentaje de NA
+
+# Valores duplicados
+sum(duplicated(datos))
+```
+
+## Analizamos las variables categóricas
+
+```{r variables-categoricas}
+#table(datos$Subject) #Vemos las frecuencias por temática científica
+#prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
+#Representamos los datos para visualizarlos mejor
+barplot(table(datos$Subject))
+
+barplot(table(datos$RetractionDate))
+#Vemos el formato de las fechas para especificarlo más abajo
+#head(datos$RetractionDate)
+# Convertimos la variable a formato fecha
+fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
+# Creamos el histograma
+hist(as.numeric(fechas),
+     main = "Distribución de las fechas de retractación",
+     xlab = "Fecha",
+     ylab = "Frecuencia",
+     xaxt = "n")
+# Personalizamos el eje X para mostrar fechas
+fechas_eje <- pretty(range(fechas, na.rm = TRUE))
+
+axis(1,
+     at = as.numeric(fechas_eje),
+     labels = format(fechas_eje, "%m/%d/%Y"))
+```
+
+## Análisis de las disciplinas científicas
+
+```{r disciplinas-cientificas}
+# Número de disciplinas diferentes (solo la cabecera, solo 10 disciplinas diferentes)
+head(unique(datos$Subject), 10)
+length(unique(datos$Subject)) # Tenemos 12575 disciplinas
+
+#Frecuencias absolutas y relativas 
+freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
+knitr::kable(head(freq_subject, 10))
+
+#prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
+
+# Seleccionamos las 10 disciplinas más frecuentes
+freq <- sort(freq_subject, decreasing = TRUE) 
+top10_subject <- head(freq, 10)
+top10_subject
+
+# Representamos las 10 disciplinas más frecuentes con nombres abreviados
+barplot(top10_subject,
+        horiz = TRUE,
+        las = 1,
+        names.arg = abbreviate(names(top10_subject), minlength = 6),
+        main = "Top 10 disciplinas científicas",
+        xlab = "Frecuencia",
+        col = "lightpink")
+```
+
+## Análisis de los países
+
+```{r paises}
+# Calculamos las frecuencias absolutas por país
+paises <- sort(table(datos$Country), decreasing = TRUE)
+
+# Seleccionamos los 10 países más frecuentes
+top10_paises <- head(paises, 10)
+
+# Cambiar nombres de los países
+library(dplyr)
+
+names(top10_paises) <- recode(names(top10_paises),"United Kingdom" = "UK","United States" = "US","South Korea" = "SK")
+
+# Representamos los países más frecuentes
+barplot(top10_paises,
+        las = 2,
+        main = "Top 10 países",
+        ylab = "Frecuencia",
+        col = "lightblue")
+
+```
+
+## Análisis por continente
+
+```{r continentes}
+library(countrycode)
+library(dplyr)
+library(tidyr)
+
+# Separar los países que están concatenados con ';' en filas distintas
+datos_clean <- datos %>%
+  separate_longer_delim(Country, delim = ";") %>% 
+  mutate(Country = trimws(Country)) # Limpiar espacios en blanco al inicio/final
+
+# Asignar el continente a cada registro de tu dataset 
+datos_new <- datos_clean %>%
+  mutate(continente = countrycode(Country, origin = "country.name", destination = "continent"))
+```
