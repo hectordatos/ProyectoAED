@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Leer los datos
 
-```{r pressure, echo=FALSE}
+```{r carga-datos}
 datos <- read.csv("data/retractions.csv")
 ```
 
@@ -19,7 +19,7 @@ datos <- read.csv("data/retractions.csv")
 
 ## Análisis inicial
 
-```{r tablas, echo=FALSE, warning=FALSE, message=FALSE}
+```{r tablas}
 #View(datos)
 
 # head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
@@ -86,8 +86,8 @@ axis(1,
 ## Análisis de las disciplinas científicas
 
 ```{r disciplinas-cientificas}
-# Número de disciplinas diferentes 
-unique(datos$Subject) 
+# Número de disciplinas diferentes (solo la cabecera, solo 10 disciplinas diferentes)
+head(unique(datos$Subject), 10)
 length(unique(datos$Subject)) # Tenemos 12575 disciplinas
 
 #Frecuencias absolutas y relativas 
