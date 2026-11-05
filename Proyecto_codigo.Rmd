@@ -78,27 +78,38 @@ axis(1,
      labels = format(fechas_eje, "%d-%m-%y"))
 ```
 
-```{r}
-#Representamos los datos para visualizarlos mejor
-barplot(table(datos$Subject))
-barplot(table(datos$RetractionDate))
-#El plot sale muy denso, mejor nos centramos solo en una disciplina científica
-unique(datos$Subject)
-length(unique(datos$Subject)) #Tenemos 12575 disciplinas
-#Ahora calculamos las frecuencias absolutas para saber en qué disciplina nos conviene más centrarnos
-table(datos$Subject) 
-prop.table(table(datos$Subject))*100
+## Análisis de las disciplinas científicas
 
-#Aunque también podemos centrarnos en las 10 categorías más repetidas
-freq <- sort(table(datos$Subject), decreasing = TRUE)
-#y las representamos en horizaontal porque los nombres son largos
-barplot(head(freq, 10),
-        horiz = TRUE, 
+```{r}
+# Número de disciplinas diferentes 
+unique(datos$Subject) 
+length(unique(datos$Subject)) # Tenemos 12575 disciplinas
+
+#Frecuencias absolutas y relativas 
+freq_subject <- table(datos$Subject) 
+freq_subject 
+
+#prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
+
+# Seleccionamos las 10 disciplinas más frecuentes
+freq <- sort(freq_subject, decreasing = TRUE) 
+top10_subject <- head(freq, 10)
+top10_subject
+
+# Representamos las 10 disciplinas más frecuentes con nombres abreviados
+barplot(top10_subject,
+        horiz = TRUE,
         las = 1,
-        cex.names = 0.2, 
-        main ="Top 10 disciplinas científicas",
+        names.arg = abbreviate(names(top10_subject), minlength = 6),
+        main = "Top 10 disciplinas científicas",
         xlab = "Frecuencia",
         col = "lightpink")
+```
+
+## 
+
+```{r}
+
 #también podemos ver cuáles son los países más frecuentes en datos absolutos
 paises <- sort(table(datos$Country), decreasing = TRUE)
 top10_paises <- head(paises, 10)
