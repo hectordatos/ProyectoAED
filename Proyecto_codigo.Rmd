@@ -80,7 +80,7 @@ fechas_eje <- pretty(range(fechas, na.rm = TRUE))
 
 axis(1,
      at = as.numeric(fechas_eje),
-     labels = format(fechas_eje, "%d-%m-%y"))
+     labels = format(fechas_eje, "%m/%d/%Y"))
 ```
 
 ## Análisis de las disciplinas científicas
