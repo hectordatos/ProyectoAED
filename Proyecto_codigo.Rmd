@@ -172,3 +172,5 @@ bp <- barplot(frecuencia_continentes$retractaciones,
 
 axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
 ```
+
+## Estudio de valores atípicos/outliers
