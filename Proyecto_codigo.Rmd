@@ -106,17 +106,20 @@ barplot(top10_subject,
         col = "lightpink")
 ```
 
-## 
+## Análisis de los países
 
 ```{r}
-
-#también podemos ver cuáles son los países más frecuentes en datos absolutos
+# Calculamos las frecuencias absolutas por país
 paises <- sort(table(datos$Country), decreasing = TRUE)
+
+# Seleccionamos los 10 países más frecuentes
 top10_paises <- head(paises, 10)
-#representamos los países
-barplot(head(top10_paises, 10),
+
+# Representamos los países más frecuentes
+barplot(top10_paises,
         las = 2,
-        main ="Top 10 países",
+        main = "Top 10 países",
+        ylab = "Frecuencia",
         col = "lightblue")
 
 ```
