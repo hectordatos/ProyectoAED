@@ -20,7 +20,7 @@ datos <- read.csv("data/retractions.csv")
 ## Análisis inicial
 
 ```{r tablas}
-#View(datos)
+View(datos)
 
 # head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
 head(datos)
@@ -59,14 +59,14 @@ sum(duplicated(datos))
 ## Analizamos las variables categóricas
 
 ```{r variables-categoricas}
-#table(datos$Subject) #Vemos las frecuencias por temática científica
-#prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
+table(datos$Subject) #Vemos las frecuencias por temática científica
+prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
 #Representamos los datos para visualizarlos mejor
 barplot(table(datos$Subject))
 
 barplot(table(datos$RetractionDate))
 #Vemos el formato de las fechas para especificarlo más abajo
-#head(datos$RetractionDate)
+head(datos$RetractionDate)
 # Convertimos la variable a formato fecha
 fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
 # Creamos el histograma
@@ -94,7 +94,7 @@ length(unique(datos$Subject)) # Tenemos 12575 disciplinas
 freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
 knitr::kable(head(freq_subject, 10))
 
-#prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
+prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
 freq <- sort(freq_subject, decreasing = TRUE) 
@@ -141,12 +141,34 @@ library(countrycode)
 library(dplyr)
 library(tidyr)
 
-# Separar los países que están concatenados con ';' en filas distintas
-datos_clean <- datos %>%
+# Separar los países concatenados por ';'
+datos_new <- datos %>%
   separate_longer_delim(Country, delim = ";") %>% 
-  mutate(Country = trimws(Country)) # Limpiar espacios en blanco al inicio/final
+  mutate(Country = trimws(Country))
 
-# Asignar el continente a cada registro de tu dataset.
-datos_new <- datos_clean %>%
-  mutate(continente = countrycode(Country, origin = "country.name", destination = "continent"))
+# Asignar continente
+datos_new <- datos_new %>%
+  mutate(Continent = countrycode(Country, origin = "country.name", destination = "continent"))
+
+# Eliminar duplicados dentro del mismo (artículo, continente)
+datos_clean <- datos_new %>%
+  filter(!is.na(Continent)) %>%         
+  distinct(Title, Continent, .keep_all = TRUE) # Cambia 'id' por el identificador de tu artículo
+
+# Contar el número total de artículos por continente
+frecuencia_continentes <- datos_clean %>%
+  count(Continent, sort = TRUE, name = "retractaciones")
+
+# Ajustar márgenes para que quepan las etiquetas verticales
+par(mar = c(7, 6, 4, 2))
+
+# Dibujar el gráfico de barras 
+bp <- barplot(frecuencia_continentes$retractaciones,
+              las = 1,                                      # Orientación horizontal para los números del eje Y
+              main = "Artículos retractados por continente",
+              ylab = "Número de artículos",
+              mgp = c(4.5, 1, 0),                           # Aleja la etiqueta Número de artículos para que no solape
+              col = "lightblue")
+
+axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
 ```
