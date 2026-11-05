@@ -65,6 +65,8 @@ sum(duplicated(datos))
 barplot(table(datos$Subject))
 
 barplot(table(datos$RetractionDate))
+#Vemos el formato de las fechas para especificarlo más abajo
+#head(datos$RetractionDate)
 # Convertimos la variable a formato fecha
 fechas <- as.Date(datos$RetractionDate, format="%d/%m/%Y")
 # Creamos el histograma
