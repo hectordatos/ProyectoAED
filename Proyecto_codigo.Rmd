@@ -191,7 +191,14 @@ q1 <- quantile(autores_conteo$num_articulos, 0.25)
 q3 <- quantile(autores_conteo$num_articulos, 0.75)
 umbral_outlier <- q3 + 1.5 * (q3 - q1)
 
-# Filtrar outliers (opcional, para ver la lista)
+# Filtrar outliers 
 outliers_autores <- autores_conteo %>%
   filter(num_articulos > umbral_outlier)
+
+# Número de datos atípicos
+num_outliers <- nrow(outliers_autores)
+num_outliers
+
+total_autores <- nrow(autores_conteo)
+total_autores
 ```
