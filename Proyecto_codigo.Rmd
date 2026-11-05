@@ -34,6 +34,9 @@ dim(datos)
 # Nombres de las columnas(nombre de las variables)
 names(datos)
 
+# Número de valores distintos de cada variable
+sapply(datos, function(x) length(unique(x)))
+
 # str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
 str(datos)  
 
