@@ -118,6 +118,11 @@ paises <- sort(table(datos$Country), decreasing = TRUE)
 # Seleccionamos los 10 países más frecuentes
 top10_paises <- head(paises, 10)
 
+# Cambiar nombres de los países
+library(dplyr)
+
+names(top10_paises) <- recode(names(top10_paises),"United Kingdom" = "UK","United States" = "US","South Korea" = "SK")
+
 # Representamos los países más frecuentes
 barplot(top10_paises,
         las = 2,
