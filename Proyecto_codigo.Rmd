@@ -41,13 +41,19 @@ str(datos)
 summary(datos)
 ```
 
+## Identificar valores perdidos y duplicados
+
 ```{r}
-#Comprobamos los valores que hemos perdido
+# Valores perdidos
 sum(is.na(datos)) #Total de NA
 colSums(is.na(datos)) #NA por columna 
 colMeans(is.na(datos))*100 #Porcentaje de NA
-#Comprobamos los valores duplicados
+
+# Valores duplicados
 sum(duplicated(datos))
+```
+
+```{r}
 #Analizamos ahora las variables categóricas
 table(datos$Subject) #Vemos las frecuencias por temática científica
 prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
