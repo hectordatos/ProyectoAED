@@ -173,4 +173,34 @@ bp <- barplot(frecuencia_continentes$retractaciones,
 axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
 ```
 
-## Estudio de valores atípicos/outliers
+## Estudio de valores atípicos/outliers.
+
+```{r}
+library(tidyverse)
+
+# Separar autores y contar frecuencias
+autores_conteo <- datos %>%
+  separate_rows(Author, sep = ";") %>%
+  mutate(Author = str_trim(Author)) %>%
+  filter(Author != "" & !is.na(Author)) %>%
+  count(Author, name = "num_articulos") %>%
+  arrange(desc(num_articulos))
+
+# Cálculo de valores atípicos (método IQR)
+q1 <- quantile(autores_conteo$num_articulos, 0.25)
+q3 <- quantile(autores_conteo$num_articulos, 0.75)
+iqr <- q3 - q1
+
+umbral_outlier <- q3 + 1.5 * iqr
+
+# Filtrar los autores considerados outliers
+outliers_autores <- autores_conteo %>%
+  filter(num_articulos > umbral_outlier)
+outliers_autores
+
+
+
+
+  
+
+```
