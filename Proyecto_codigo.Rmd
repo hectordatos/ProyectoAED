@@ -199,6 +199,11 @@ outliers_autores <- autores_conteo %>%
 num_outliers <- nrow(outliers_autores)
 num_outliers
 
+# Número de autores total
 total_autores <- nrow(autores_conteo)
 total_autores
+
+# Cálculo de la probabilidad (proporción)
+prob_outliers <- num_outliers / total_autores
+prob_outliers
 ```
