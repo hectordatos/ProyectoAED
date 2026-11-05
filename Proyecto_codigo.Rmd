@@ -131,3 +131,20 @@ barplot(top10_paises,
         col = "lightblue")
 
 ```
+
+## Análisis por continente
+
+```{r}
+library(countrycode)
+library(dplyr)
+library(tidyr)
+
+# Separar los países que están concatenados con ';' en filas distintas
+datos_clean <- datos %>%
+  separate_longer_delim(Country, delim = ";") %>% 
+  mutate(Country = trimws(Country)) # Limpiar espacios en blanco al inicio/final
+
+# Asignar el continente a cada registro de tu dataset 
+datos_new <- datos_clean %>%
+  mutate(continente = countrycode(Country, origin = "country.name", destination = "continent"))
+```
