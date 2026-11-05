@@ -144,7 +144,7 @@ datos_clean <- datos %>%
   separate_longer_delim(Country, delim = ";") %>% 
   mutate(Country = trimws(Country)) # Limpiar espacios en blanco al inicio/final
 
-# Asignar el continente a cada registro de tu dataset 
+# Asignar el continente a cada registro de tu dataset.
 datos_new <- datos_clean %>%
   mutate(continente = countrycode(Country, origin = "country.name", destination = "continent"))
 ```
