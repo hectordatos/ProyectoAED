@@ -15,19 +15,33 @@ knitr::opts_chunk$set(echo = TRUE)
 datos <- read.csv("data/retractions.csv")
 ```
 
-## Análisis previo de los datos
+# Análisis previo de los datos
+
+## Análisis inicial
 
 ```{r}
-#Análisis inicial
 View(datos)
+
+# head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
 head(datos)
-tail(datos)
+
+# tail(datos): Muestra las últimas 6 filas para comprobar que el archivo cargó completo y sin errores
+tail(datos) 
+
+# dim(datos): devuelve el número de filas y columnas del dataframe.
 dim(datos)
-#Nombres de las columnas
+
+# Nombres de las columnas(nombre de las variables)
 names(datos)
-str(datos)
-#Resumen estadístico de los datos
+
+# str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
+str(datos)  
+
+# summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
 summary(datos)
+```
+
+```{r}
 #Comprobamos los valores que hemos perdido
 sum(is.na(datos)) #Total de NA
 colSums(is.na(datos)) #NA por columna 
@@ -67,4 +81,3 @@ barplot(head(top10_paises, 10),
         col = "lightblue")
 
 ```
-
