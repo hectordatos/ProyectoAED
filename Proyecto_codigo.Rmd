@@ -225,7 +225,7 @@ axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 
 ```{r analisis-outliers}
 library(tidyverse)
 
-# 1. Separar autores y contar frecuencias
+# Separar autores y contar frecuencias
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
   mutate(Author = str_trim(Author)) %>%
@@ -233,7 +233,7 @@ autores_conteo <- datos %>%
   count(Author, name = "num_articulos") %>%
   arrange(desc(num_articulos))
 
-# 2. Definición de funciones para la detección de outliers
+# Definición de funciones para la detección de outliers
 reglasigma <- function(x) {
   mu <- mean(x, na.rm = TRUE)
   sigma <- sd(x, na.rm = TRUE)
@@ -257,7 +257,7 @@ reglapercentil <- function(x) {
   x < p[1] | x > p[2]
 }
 
-# 3. Aplicación de las reglas sobre el conjunto de datos
+# Aplicación de las reglas sobre el conjunto de datos
 autores_analisis <- autores_conteo %>%
   mutate(
     Es_Sigma     = reglasigma(num_articulos),
@@ -266,7 +266,7 @@ autores_analisis <- autores_conteo %>%
     Es_Percentil = reglapercentil(num_articulos)
   )
 
-# 4. Cálculo de totales y probabilidades por método
+# Cálculo de totales y probabilidades por método
 total_autores <- nrow(autores_analisis)
 
 resumen_outliers <- tibble(
@@ -280,7 +280,6 @@ resumen_outliers <- tibble(
 ) %>%
   mutate(Probabilidad = Num_Outliers / total_autores)
 
-# Mostrar resumen estadístico en consola
 resumen_outliers
 
 ```
