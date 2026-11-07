@@ -225,7 +225,7 @@ axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 
 ```{r analisis-outliers}
 library(tidyverse)
 
-# Separar autores y contar frecuencias
+# 1. Separar autores y contar frecuencias
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
   mutate(Author = str_trim(Author)) %>%
@@ -233,26 +233,56 @@ autores_conteo <- datos %>%
   count(Author, name = "num_articulos") %>%
   arrange(desc(num_articulos))
 
-# Cálculo de valores atípicos (método IQR)
-q1 <- quantile(autores_conteo$num_articulos, 0.25)
-q3 <- quantile(autores_conteo$num_articulos, 0.75)
-umbral_outlier <- q3 + 1.5 * (q3 - q1)
+# 2. Definición de funciones para la detección de outliers
+reglasigma <- function(x) {
+  mu <- mean(x, na.rm = TRUE)
+  sigma <- sd(x, na.rm = TRUE)
+  abs(x - mu) > 3 * sigma
+}
 
-# Filtrar outliers 
-outliers_autores <- autores_conteo %>%
-  filter(num_articulos > umbral_outlier)
+reglahampel <- function(x) {
+  med <- median(x, na.rm = TRUE)
+  v_mad <- 1.4826 * median(abs(x - med), na.rm = TRUE)
+  abs(x - med) > 3 * v_mad
+}
 
-# Número de datos atípicos
-num_outliers <- nrow(outliers_autores)
-num_outliers
+reglaboxplot <- function(x) {
+  q <- quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
+  iqr <- q[2] - q[1]
+  x < (q[1] - 1.5 * iqr) | x > (q[2] + 1.5 * iqr)
+}
 
-# Número de autores total
-total_autores <- nrow(autores_conteo)
-total_autores
+reglapercentil <- function(x) {
+  p <- quantile(x, probs = c(0.05, 0.95), na.rm = TRUE)
+  x < p[1] | x > p[2]
+}
 
-# Cálculo de la probabilidad 
-prob_outliers <- num_outliers / total_autores
-prob_outliers
+# 3. Aplicación de las reglas sobre el conjunto de datos
+autores_analisis <- autores_conteo %>%
+  mutate(
+    Es_Sigma     = reglasigma(num_articulos),
+    Es_Hampel    = reglahampel(num_articulos),
+    Es_Boxplot   = reglaboxplot(num_articulos),
+    Es_Percentil = reglapercentil(num_articulos)
+  )
+
+# 4. Cálculo de totales y probabilidades por método
+total_autores <- nrow(autores_analisis)
+
+resumen_outliers <- tibble(
+  Metodo = c("3-Sigma", "Hampel", "Boxplot", "Percentil"),
+  Num_Outliers = c(
+    sum(autores_analisis$Es_Sigma),
+    sum(autores_analisis$Es_Hampel),
+    sum(autores_analisis$Es_Boxplot),
+    sum(autores_analisis$Es_Percentil)
+  )
+) %>%
+  mutate(Probabilidad = Num_Outliers / total_autores)
+
+# Mostrar resumen estadístico en consola
+resumen_outliers
+
 ```
 
 \endgroup
