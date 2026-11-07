@@ -5,23 +5,34 @@ date: "2026-11-02"
 output: 
   pdf_document:
     latex_engine: xelatex
+    pandoc_args: ["-V", "fontsize=6pt"]
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.width = 5,
+  fig.height = 3,
+  out.width = "45%",
+  size = "scriptsize"
+)
 ```
 
 ## Leer los datos
-
+\begingroup 
+\scriptsize
 ```{r carga-datos}
 datos <- read.csv("data/retractions.csv")
 ```
+\endgroup
 
 # Análisis previo de los datos
 
 ## Análisis inicial
 
-```{r tablas}
+\begingroup 
+\scriptsize
+```{r tablas, warning=FALSE}
 View(datos)
 
 # head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
@@ -45,9 +56,11 @@ str(datos)
 # summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
 summary(datos)
 ```
+\endgroup
 
 ## Identificar valores perdidos y duplicados
-
+\begingroup 
+\scriptsize
 ```{r valores_perdidos}
 # Valores perdidos
 sum(is.na(datos)) #Total de NA
@@ -57,9 +70,11 @@ colMeans(is.na(datos))*100 #Porcentaje de NA
 # Valores duplicados
 sum(duplicated(datos))
 ```
+\endgroup
 
 ## Analizamos las variables categóricas
-
+\begingroup 
+\scriptsize
 ```{r variables-categoricas}
 head(sort(table(datos$Subject), decreasing = TRUE), 10) #Vemos las frecuencias por temática científica
 head(sort(prop.table(table(datos$Subject)), decreasing =TRUE), 10) #tabla para saber qué temática científica es más frecuente
@@ -84,9 +99,12 @@ axis(1,
      at = as.numeric(fechas_eje),
      labels = format(fechas_eje, "%m/%d/%Y"))
 ```
+\endgroup
 
 ## Análisis de las disciplinas científicas
 
+\begingroup 
+\scriptsize
 ```{r disciplinas-cientificas}
 # Número de disciplinas diferentes (solo la cabecera, solo 10 disciplinas diferentes)
 head(unique(datos$Subject), 10)
@@ -112,9 +130,12 @@ barplot(top10_subject,
         xlab = "Frecuencia",
         col = "lightpink")
 ```
+\endgroup
 
 ## Análisis de los países
 
+\begingroup 
+\scriptsize
 ```{r paises}
 # Calculamos las frecuencias absolutas por país
 paises <- sort(table(datos$Country), decreasing = TRUE)
@@ -135,9 +156,12 @@ barplot(top10_paises,
         col = "lightblue")
 
 ```
+\endgroup
 
 ## Análisis por continente
 
+\begingroup 
+\scriptsize
 ```{r continentes}
 library(countrycode)
 library(dplyr)
@@ -174,10 +198,12 @@ bp <- barplot(frecuencia_continentes$retractaciones,
 
 axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
 ```
+\endgroup
 
 ## Estudio de valores atípicos/outliers.
-
-```{r}
+\begingroup 
+\scriptsize
+```{r analisis-outliers}
 library(tidyverse)
 
 # Separar autores y contar frecuencias
@@ -209,3 +235,4 @@ total_autores
 prob_outliers <- num_outliers / total_autores
 prob_outliers
 ```
+\endgroup
