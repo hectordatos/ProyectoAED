@@ -2,7 +2,9 @@
 title: "Proyecto_final_codigo"
 author: "Miriam Caballero Cervero"
 date: "2026-11-02"
-output: pdf_document
+output: 
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -38,7 +40,7 @@ names(datos)
 sapply(datos, function(x) length(unique(x)))
 
 # str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
-str(datos)  
+str(datos)
 
 # summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
 summary(datos)
@@ -59,8 +61,8 @@ sum(duplicated(datos))
 ## Analizamos las variables categóricas
 
 ```{r variables-categoricas}
-table(datos$Subject) #Vemos las frecuencias por temática científica
-prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
+head(sort(table(datos$Subject), decreasing = TRUE), 10) #Vemos las frecuencias por temática científica
+head(sort(prop.table(table(datos$Subject)), decreasing =TRUE), 10) #tabla para saber qué temática científica es más frecuente
 #Representamos los datos para visualizarlos mejor
 barplot(table(datos$Subject))
 
@@ -94,7 +96,7 @@ length(unique(datos$Subject)) # Tenemos 12575 disciplinas
 freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
 knitr::kable(head(freq_subject, 10))
 
-prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
+knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
 freq <- sort(freq_subject, decreasing = TRUE) 
