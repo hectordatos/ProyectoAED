@@ -1,6 +1,8 @@
 ---
 title: "Proyecto_final_codigo"
-author: "Miriam Caballero Cervero"
+author: 
+  - "Miriam Caballero Cervero" 
+  - "Héctor García Díez"
 date: "2026-11-02"
 output: 
   pdf_document:
