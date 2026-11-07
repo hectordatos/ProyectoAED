@@ -168,7 +168,6 @@ barplot(top10_paises,
         main = "Top 10 países",
         ylab = "Frecuencia",
         col = "lightblue")
-
 ```
 
 \endgroup
@@ -279,7 +278,6 @@ resumen_outliers <- tibble(
   )
 ) %>%
   mutate(Probabilidad = Num_Outliers / total_autores)
-
 resumen_outliers
 
 ```
