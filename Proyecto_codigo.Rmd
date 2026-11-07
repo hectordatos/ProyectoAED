@@ -278,8 +278,8 @@ resumen_outliers <- tibble(
   )
 ) %>%
   mutate(Probabilidad = Num_Outliers / total_autores)
-resumen_outliers
 
+resumen_outliers
 ```
 
 \endgroup
