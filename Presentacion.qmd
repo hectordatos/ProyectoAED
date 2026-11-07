@@ -1,6 +1,8 @@
 ---
 title: "Análisis exploratorio de retractaciones científicas"
-author: "Miriam Caballero Cerveró"
+author: 
+  - "Miriam Caballero Cerveró"
+  - "Héctor García Díez"
 format:
   revealjs:
     theme: simple
@@ -19,18 +21,28 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## 
+
 ## Leer los datos
+
+\begingroup 
+\scriptsize
 
 ```{r carga-datos}
 datos <- read.csv("data/retractions.csv")
 ```
 
+\endgroup
+
 # Análisis previo de los datos
 
 ## Análisis inicial
 
-```{r tablas}
-#View(datos)
+\begingroup 
+\scriptsize
+
+```{r tablas, warning=FALSE}
+View(datos)
 
 # head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
 head(datos)
@@ -48,13 +60,18 @@ names(datos)
 sapply(datos, function(x) length(unique(x)))
 
 # str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
-str(datos)  
+str(datos)
 
 # summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
 summary(datos)
 ```
 
+\endgroup
+
 ## Identificar valores perdidos y duplicados
+
+\begingroup 
+\scriptsize
 
 ```{r valores_perdidos}
 # Valores perdidos
@@ -66,17 +83,22 @@ colMeans(is.na(datos))*100 #Porcentaje de NA
 sum(duplicated(datos))
 ```
 
+\endgroup
+
 ## Analizamos las variables categóricas
 
+\begingroup 
+\scriptsize
+
 ```{r variables-categoricas}
-#table(datos$Subject) #Vemos las frecuencias por temática científica
-#prop.table(table(datos$Subject)) #tabla para saber qué temática científica es más frecuente
+head(sort(table(datos$Subject), decreasing = TRUE), 10) #Vemos las frecuencias por temática científica
+head(sort(prop.table(table(datos$Subject)), decreasing =TRUE), 10) #tabla para saber qué temática científica es más frecuente
 #Representamos los datos para visualizarlos mejor
 barplot(table(datos$Subject))
 
 barplot(table(datos$RetractionDate))
 #Vemos el formato de las fechas para especificarlo más abajo
-#head(datos$RetractionDate)
+head(datos$RetractionDate)
 # Convertimos la variable a formato fecha
 fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
 # Creamos el histograma
@@ -93,7 +115,12 @@ axis(1,
      labels = format(fechas_eje, "%m/%d/%Y"))
 ```
 
+\endgroup
+
 ## Análisis de las disciplinas científicas
+
+\begingroup 
+\scriptsize
 
 ```{r disciplinas-cientificas}
 # Número de disciplinas diferentes (solo la cabecera, solo 10 disciplinas diferentes)
@@ -104,7 +131,7 @@ length(unique(datos$Subject)) # Tenemos 12575 disciplinas
 freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
 knitr::kable(head(freq_subject, 10))
 
-#prop.table(freq_subject)*100 # Frecuencias relativas en porcentaje
+knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
 freq <- sort(freq_subject, decreasing = TRUE) 
@@ -121,7 +148,12 @@ barplot(top10_subject,
         col = "lightpink")
 ```
 
+\endgroup
+
 ## Análisis de los países
+
+\begingroup 
+\scriptsize
 
 ```{r paises}
 # Calculamos las frecuencias absolutas por país
@@ -144,19 +176,88 @@ barplot(top10_paises,
 
 ```
 
+\endgroup
+
 ## Análisis por continente
+
+\begingroup 
+\scriptsize
 
 ```{r continentes}
 library(countrycode)
 library(dplyr)
 library(tidyr)
 
-# Separar los países que están concatenados con ';' en filas distintas
-datos_clean <- datos %>%
+# Separar los países concatenados por ';'
+datos_new <- datos %>%
   separate_longer_delim(Country, delim = ";") %>% 
-  mutate(Country = trimws(Country)) # Limpiar espacios en blanco al inicio/final
+  mutate(Country = trimws(Country))
 
-# Asignar el continente a cada registro de tu dataset 
-datos_new <- datos_clean %>%
-  mutate(continente = countrycode(Country, origin = "country.name", destination = "continent"))
+# Asignar continente
+datos_new <- datos_new %>%
+  mutate(Continent = countrycode(Country, origin = "country.name", destination = "continent"))
+
+# Eliminar duplicados dentro del mismo (artículo, continente)
+datos_clean <- datos_new %>%
+  filter(!is.na(Continent)) %>%         
+  distinct(Title, Continent, .keep_all = TRUE) # Cambia 'id' por el identificador de tu artículo
+
+# Contar el número total de artículos por continente
+frecuencia_continentes <- datos_clean %>%
+  count(Continent, sort = TRUE, name = "retractaciones")
+
+# Ajustar márgenes para que quepan las etiquetas verticales
+par(mar = c(7, 6, 4, 2))
+
+# Dibujar el gráfico de barras 
+bp <- barplot(frecuencia_continentes$retractaciones,
+              las = 1,                                      # Orientación horizontal para los números del eje Y
+              main = "Artículos retractados por continente",
+              ylab = "Número de artículos",
+              mgp = c(4.5, 1, 0),                           # Aleja la etiqueta Número de artículos para que no solape
+              col = "lightblue")
+
+axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
 ```
+
+\endgroup
+
+## Estudio de valores atípicos/outliers.
+
+\begingroup 
+\scriptsize
+
+```{r analisis-outliers}
+library(tidyverse)
+
+# Separar autores y contar frecuencias
+autores_conteo <- datos %>%
+  separate_rows(Author, sep = ";") %>%
+  mutate(Author = str_trim(Author)) %>%
+  filter(Author != "" & !is.na(Author)) %>%
+  count(Author, name = "num_articulos") %>%
+  arrange(desc(num_articulos))
+
+# Cálculo de valores atípicos (método IQR)
+q1 <- quantile(autores_conteo$num_articulos, 0.25)
+q3 <- quantile(autores_conteo$num_articulos, 0.75)
+umbral_outlier <- q3 + 1.5 * (q3 - q1)
+
+# Filtrar outliers 
+outliers_autores <- autores_conteo %>%
+  filter(num_articulos > umbral_outlier)
+
+# Número de datos atípicos
+num_outliers <- nrow(outliers_autores)
+num_outliers
+
+# Número de autores total
+total_autores <- nrow(autores_conteo)
+total_autores
+
+# Cálculo de la probabilidad (proporción)
+prob_outliers <- num_outliers / total_autores
+prob_outliers
+```
+
+\endgroup
