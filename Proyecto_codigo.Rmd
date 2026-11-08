@@ -191,7 +191,7 @@ datos_new <- datos %>%
 datos_new <- datos_new %>%
   mutate(Continent = countrycode(Country, origin = "country.name", destination = "continent"))
 
-# Eliminar duplicados dentro del mismo (artículo, continente)
+# Eliminar duplicados dentro del mismo (artículo, continente).
 datos_clean <- datos_new %>%
   filter(!is.na(Continent)) %>%         
   distinct(Title, Continent, .keep_all = TRUE) # Cambia 'id' por el identificador de tu artículo
