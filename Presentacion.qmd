@@ -194,20 +194,26 @@ Un outlier es una observación que no parece consistente con el resto de valores
 Obtenemos un dataframede los autores junto con el recuento individual de sus retractaciones, ordenada con los autores más frecuentemente retractados en las primeras filas.
 
 ```{r autores}
+#| echo: true
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
   mutate(Author = trimws(Author)) %>%
   filter(!is.na(Author), Author != "") %>%
   count(Author, name = "num_articulos") %>%
   arrange(desc(num_articulos))
+```
+
+## Tabla retracciones por autor
+
+Generamos una tabla de la distribución de retractaciones por autor.
+
+```{r}
 knitr::kable(data.frame(
   Indicador = c("Nombres distintos", "Mediana de registros", "Máximo de registros"),
   Valor = c(nrow(autores_conteo), median(autores_conteo$num_articulos),
             max(autores_conteo$num_articulos))
 ))
 ```
-
-Generamos una tabla de la distribución de retractaciones por autor.
 
 ## ¿Cómo se distribuyen los registros por autor?
 
