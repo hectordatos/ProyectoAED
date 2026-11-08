@@ -300,6 +300,8 @@ barplot(resumen_outliers$Porcentaje,
         ylab = "Porcentaje (%)")
 ```
 
+Muestra el porcentaje de *outliers* detectados por cada método, evidenciando que Hampel y Boxplot son muy laxos al clasificar atípicos, mientras que 3-Sigma y Percentil resultan sustancialmente más restrictivos.
+
 ## ¿Coinciden los métodos?
 
 ```{r coincidencia-metodos}
@@ -311,6 +313,8 @@ barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
         xlab = "Número de reglas que detectan el nombre",
         ylab = "Número de nombres")
 ```
+
+En la gráfica se puede apreciar como la mayoría de los datos no se consideran outliers mientras que hay muy pocos casos en los que coinciden los 4 metodosn pero no 0, ya que el método 3-sigma es el más restrictivo.
 
 ## Interpretación de los outliers
 
