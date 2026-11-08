@@ -1,7 +1,7 @@
 ---
 title: "Análisis exploratorio de artículos científicos retractados"
 author:
-  - "Miriam Caballero Cervero"
+  - "Miriam Caballero Cerveró"
   - "Héctor García Díez"
 date: "2026-11-02"
 format:
