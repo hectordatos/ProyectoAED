@@ -161,7 +161,7 @@ Un mismo artículo puede estar asociado a varios países.
 
 ## ¿Por qué separar los países?
 
-Un registro con `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+Un registro como `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
 ```{r}
 #| echo: true
 # Separamos los países concatenados para no contar combinaciones como un solo país.
