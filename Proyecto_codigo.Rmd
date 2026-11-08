@@ -108,12 +108,6 @@ hist(years,
      xlab = "Año",
      ylab = "Frecuencia",
      col = "lightblue")
-# Personalizamos el eje X para mostrar fechas
-fechas_eje <- pretty(range(fechas, na.rm = TRUE))
-
-axis(1,
-     at = as.numeric(fechas_eje),
-     labels = format(fechas_eje, "%m/%d/%Y"))
 ```
 
 \endgroup
