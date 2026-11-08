@@ -178,6 +178,8 @@ barplot(rev(frecuencia_continentes$retractaciones), horiz = TRUE,
 
 ## ¿Qué podemos concluir de los mapas de frecuencia?
 
+Asia lidera masivamente el número de retractaciones (más de 35.000), seguida a gran distancia por Europa y América, siendo África y Oceanía testimoniales.
+
 ## ¿Qué entendemos por valores atípicos(outliers)?
 
 Un outlier es una observación que no parece consistente con el resto de valores de esa variable. Estudiamos el **número de registros asociados a cada nombre de autor**. Comparamos cuatro reglas de detección:
@@ -314,7 +316,7 @@ barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
         ylab = "Número de nombres")
 ```
 
-La mayoría de los autores no son *outliers* y solo unos pocos casos extremos cumplen los 4 criterios (los marcados por 3-Sigma por ser el más restrictivo).
+La mayoría de los autores no son outliers y solo unos pocos casos extremos cumplen los 4 criterios (los marcados por 3-Sigma por ser el más restrictivo).
 
 ## Interpretación de los outliers
 
