@@ -37,7 +37,9 @@ Una **retractación** es una retirada formal de un artículo del registro cient�
 
 ## ¿Qué vamos a estudiar?
 
-Analizamos los registros de artículos científicos retractados para conocer su distribución por **fecha, disciplina, país y continente**, y detectar recuentos atípicos por autor.
+Analizamos los registros de artículos científicos retractados para conocer su distribución por **fecha, disciplina, país y continente**.
+
+Por último, identificaremos los datos atípicos (outliers) aplicando los cuatro métodos analizados en clase.
 
 ## ¿Qué significa cada variable?
 
@@ -63,7 +65,7 @@ knitr::kable(resumen)
 Cada fila representa un registro de la base de datos. El número de valores distintos de `Subject` puede incluir combinaciones de disciplinas.
 
 ## Calidad de los datos
-
+Se observa una elevada presencia de valores ausentes, tal como refleja la siguiente tabla. Esto muestra que la frecuencia de DOIs duplicados es menor que la de los datos ausentes.
 ```{r valores-perdidos}
 doi <- trimws(as.character(datos$OriginalPaperDOI))
 doi <- doi[!is.na(doi) & doi != ""]
@@ -85,11 +87,13 @@ knitr::kable(calidad)
 ## ¿Qué variables tienen más datos ausentes?
 
 ```{r porcentaje-na}
+library(kableExtra)
 porcentajes_na <- sort(colMeans(is.na(datos)) * 100, decreasing = TRUE)
 knitr::kable(data.frame(
   Variable = names(head(porcentajes_na, 8)),
   Porcentaje_NA = round(as.numeric(head(porcentajes_na, 8)), 2)
-))
+))%>%
+  kable_styling(font_size = 32)
 ```
 
 ## Retractaciones a lo largo del tiempo
@@ -126,12 +130,14 @@ Las categorías se cuentan tal como aparecen en la columna `Subject`.
 ## Frecuencias relativas de las disciplinas
 
 ```{r frecuencias-subject}
+library(kableExtra)
 tabla_subject <- data.frame(
   Categoria = abbreviate(names(top10_subject), minlength = 15),
   Frecuencia = as.numeric(top10_subject),
   Porcentaje = round(100 * as.numeric(top10_subject) / sum(freq_subject), 2)
 )
-knitr::kable(tabla_subject)
+knitr::kable(tabla_subject)%>%
+  kable_styling(font_size = 26)
 ```
 
 ## Países con más registros
@@ -226,17 +232,20 @@ barplot(head(conteos, 12), col = "lightblue",
         xlab = "Registros por nombre de autor", ylab = "Número de nombres")
 ```
 
-## Cuatro reglas, cuatro criterios.
+## Cuatro reglas, cuatro criterios
 
-Tenemos 4 criterios diferentes para obtener los ouliers o datos atípicos.
+Tenemos 4 criterios diferentes para obtener los outliers o datos atípicos.
 
-| Regla       | Referencia                | Criterio                            |
-|------------------|-----------------------|-------------------------------|
-| 3-Sigma     | Media y desviación típica | Distancia mayor que 3 desviaciones  |
-| Hampel      | Mediana y MAD             | Distancia mayor que 3 MAD ajustadas |
-| Boxplot     | Cuartiles e IQR           | Fuera de los límites 1,5 IQR        |
-| Percentiles | Percentiles 5 y 95        | Fuera de ese intervalo              |
+<div style="font-size: 70%;">
 
+| Regla | Referencia | Criterio |
+|---|---|---|
+| 3-Sigma | Media y desviación típica | Distancia mayor que 3 desviaciones |
+| Hampel | Mediana y MAD | Distancia mayor que 3 MAD ajustadas |
+| Boxplot | Cuartiles e IQR | Fuera de los límites 1,5 IQR |
+| Percentiles | Percentiles 5 y 95 | Fuera de ese intervalo |
+
+</div>
 ## Aplicación de las cuatro reglas
 
 Definimos 4 funciones, una función para cada regla.
@@ -287,8 +296,9 @@ knitr::kable(resumen_outliers[, c("Metodo", "Num_Outliers", "Porcentaje")])
 ```
 
 ## ¿Qué umbrales obtuvimos?
-
+La gran mayoría de los autores tiene solo 1 artículo retractado, pero unos pocos casos extremos con muchas retractaciones disparan la media y la desviación típica.
 ```{r umbrales-outliers}
+library(kableExtra)
 x <- autores_conteo$num_articulos
 tabla_umbrales <- data.frame(
   Medida = c("Media", "Desviación típica", "Mediana", "MAD ajustada", "Q1", "Q3", "IQR", "Percentil 95"),
@@ -296,10 +306,10 @@ tabla_umbrales <- data.frame(
                   unname(quantile(x, .25)), unname(quantile(x, .75)),
                   IQR(x), unname(quantile(x, .95))), 2)
 )
-knitr::kable(tabla_umbrales)
+knitr::kable(tabla_umbrales) %>%
+  kable_styling(font_size = 26)
 ```
 
-La gran mayoría de los autores tiene solo 1 artículo retractado, pero unos pocos casos extremos con muchas retractaciones disparan la media y la desviación típica.
 
 ## Comparación visual de métodos
 
