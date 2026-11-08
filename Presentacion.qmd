@@ -253,6 +253,11 @@ reglapercentil <- function(x) {
   p <- quantile(x, probs = c(0.05, 0.95), na.rm = TRUE)
   x < p[1] | x > p[2]
 }
+```
+
+Añade al dataframe cuatro columnas que marcan con `TRUE`/`FALSE` si las retractaciones de cada autor son un outlier según cada método.
+
+```{r}
 autores_analisis <- autores_conteo %>%
   mutate(Es_Sigma = reglasigma(num_articulos),
          Es_Hampel = reglahampel(num_articulos),
@@ -282,6 +287,8 @@ tabla_umbrales <- data.frame(
 )
 knitr::kable(tabla_umbrales)
 ```
+
+La gran mayoría de los autores tiene solo 1 artículo retractado, pero unos pocos casos extremos con muchas retractaciones disparan la media y la desviación típica.
 
 ## Comparación visual de métodos
 
