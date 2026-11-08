@@ -206,7 +206,7 @@ Un outlier es una observación que no parece consistente con el resto de valores
 
 ## Preparación de los recuentos por autor
 
-Obtenemos un dataframede los autores junto con el recuento individual de sus retractaciones, ordenada con los autores más frecuentemente retractados en las primeras filas.
+Obtenemos un dataframe de los autores junto con el recuento individual de sus retractaciones, ordenada con los autores más frecuentemente retractados en las primeras filas.
 
 ```{r autores}
 #| echo: true
@@ -344,7 +344,7 @@ barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
         ylab = "Número de nombres")
 ```
 
-La mayoría de los autores no son outliers y solo unos pocos casos extremos cumplen los 4 criterios (los marcados por 3-Sigma por ser el más restrictivo).
+La mayoría de los autores no son considerados outliers por ninguno de los métodos y solo unos pocos casos extremos cumplen los 4 criterios (los marcados por 3-Sigma por ser el más restrictivo).
 
 ## Interpretación de los outliers
 
