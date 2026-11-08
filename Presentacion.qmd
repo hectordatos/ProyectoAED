@@ -140,9 +140,10 @@ knitr::kable(tabla_subject)%>%
   kable_styling(font_size = 26)
 ```
 
-## ¿Por qué separar los países?
+## Estudio de los paises
 
 Un registro como `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+
 ```{r}
 #| echo: true
 # Separamos los países concatenados para no contar combinaciones como un solo país.
