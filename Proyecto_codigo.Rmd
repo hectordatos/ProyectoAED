@@ -129,7 +129,6 @@ knitr::kable(head(freq_subject, 10))
 knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
-freq <- sort(freq_subject, decreasing = TRUE) 
 top10_subject <- head(freq, 10)
 top10_subject
 
