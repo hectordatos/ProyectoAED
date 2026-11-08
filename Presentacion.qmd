@@ -242,6 +242,7 @@ Tenemos 4 criterios diferentes para obtener los ouliers o datos atípicos.
 Definimos 4 funciones, una función para cada regla.
 
 ```{r calculo-outliers}
+#| echo: true
 reglasigma <- function(x) {
   mu <- mean(x, na.rm = TRUE)
   sigma <- sd(x, na.rm = TRUE)
