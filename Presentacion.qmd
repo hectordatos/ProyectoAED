@@ -264,7 +264,9 @@ reglapercentil <- function(x) {
 }
 ```
 
-Añade al dataframe cuatro columnas que marcan con `TRUE`/`FALSE` si las retractaciones de cada autor son un outlier según cada método.
+## Creamos un dataframe con los metodos 
+
+Evaluamos qué autores son *outliers* mediante cuatro métodos estadísticos distintos y calculamos el recuento y porcentaje de atípicos que detecta cada uno.
 
 ```{r}
 autores_analisis <- autores_conteo %>%
