@@ -7,8 +7,8 @@ date: "2026-11-02"
 output:
   pdf_document:
     latex_engine: xelatex
-fontsize: 8pt
-geometry: margin=2.5cm
+fontsize: 6pt
+geometry: margin=2.0cm
 ---
 
 ```{r setup, include=FALSE}
@@ -77,8 +77,6 @@ colMeans(is.na(datos))*100 #Porcentaje de NA
 
 # Valores duplicados
 sum(duplicated(datos))
-# Artículos duplicados con el mismo DOI
-sum(duplicated(datos$OriginalPaperDOI))
 ```
 
 \endgroup
@@ -107,7 +105,7 @@ hist(years,
      main = "Retractaciones por año",
      xlab = "Año",
      ylab = "Frecuencia",
-     col = "lightblue")
+     col = "lightgreen")
 ```
 
 \endgroup
@@ -129,7 +127,7 @@ knitr::kable(head(freq_subject, 10))
 knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
-top10_subject <- head(freq, 10)
+top10_subject <- head(freq_subject, 10)
 top10_subject
 
 # Representamos las 10 disciplinas más frecuentes con nombres abreviados
