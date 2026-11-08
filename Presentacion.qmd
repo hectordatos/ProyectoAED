@@ -314,7 +314,7 @@ barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
         ylab = "Número de nombres")
 ```
 
-En la gráfica se puede apreciar como la mayoría de los datos no se consideran outliers mientras que hay muy pocos casos en los que coinciden los 4 metodosn pero no 0, ya que el método 3-sigma es el más restrictivo.
+La mayoría de los autores no son *outliers* y solo unos pocos casos extremos cumplen los 4 criterios (los marcados por 3-Sigma por ser el más restrictivo).
 
 ## Interpretación de los outliers
 
