@@ -1,13 +1,14 @@
 ---
-title: "Proyecto_final_codigo"
-author: 
-  - "Miriam Caballero Cervero" 
+title: "Análisis exploratorio de artículos científicos retractados"
+author:
+  - "Miriam Caballero Cervero"
   - "Héctor García Díez"
 date: "2026-11-02"
-output: 
+output:
   pdf_document:
     latex_engine: xelatex
-    pandoc_args: ["-V", "fontsize=6pt"]
+fontsize: 8pt
+geometry: margin=2.5cm
 ---
 
 ```{r setup, include=FALSE}
