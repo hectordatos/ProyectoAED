@@ -1,37 +1,54 @@
 ---
-title: "Análisis exploratorio de retractaciones científicas"
+title: "Análisis exploratorio de artículos científicos retractados"
 author:
-  - "Miriam Caballero Cerveró"
+  - "Miriam Caballero Cervero"
   - "Héctor García Díez"
+date: "2026-11-02"
 format:
   revealjs:
     theme: simple
-    slide-number: true
+    slide-level: 2
     transition: slide
     center: false
-    code-fold: false
-execute:
-  echo: false
-  message: false
-  warning: false
-  fig-width: 10
-  fig-height: 5
-  out-width: "90%"
-editor: visual
+    embed-resources: true
 ---
 
-```{r setup}
-#| include: false
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 5, out.width = "90%")
 library(dplyr)
 library(tidyr)
 library(countrycode)
 datos <- read.csv("data/retractions.csv")
 ```
 
+## ¿Por qué estudiar las retractaciones?
+
+Una **retractación** es una retirada formal de un artículo del registro científico. Puede producirse por errores, problemas metodológicos u otras razones.
+
+**Pregunta central:** ¿cómo ha evolucionado el número de retracciones científicas a lo largo de los años y dependiendo de distintas variables como la discilplina o el país, etc.?
+
+## Objetivos y recorrido
+
+1.  Conocer la base de datos y su calidad.
+2.  Describir la evolución temporal y las áreas científicas.
+3.  Comparar países y continentes.
+4.  Estudiar autores y contrastar cuatro reglas de valores atípicos.
+5.  Discutir las limitaciones.
+
 ## ¿Qué vamos a estudiar?
 
 Analizamos los registros de artículos científicos retractados para conocer su distribución por **fecha, disciplina, país y continente**, y detectar recuentos atípicos por autor.
+
+## ¿Qué significa cada variable?
+
+| Variable           | Qué representa                                     |
+|--------------------|----------------------------------------------------|
+| `Title`            | Título del trabajo                                 |
+| `OriginalPaperDOI` | Identificador del artículo original, cuando existe |
+| `RetractionDate`   | Fecha de retractación                              |
+| `Subject`          | Temática o conjunto de temáticas                   |
+| `Country`          | País o países asociados                            |
+| `Author`           | Autor o autores indicados                          |
 
 ## Lectura y estructura de los datos
 
@@ -57,7 +74,13 @@ calidad <- data.frame(
 knitr::kable(calidad)
 ```
 
-Los DOI repetidos requieren revisión: no siempre equivalen a registros duplicados.
+## ¿Por qué revisamos los duplicados?
+
+- Dos filas idénticas pueden indicar un registro repetido.
+- Un DOI repetido **no siempre** significa un duplicado: hay que revisar el contexto.
+- Un DOI ausente o vacío no identifica ningún artículo.
+
+**Decisión:** describimos los posibles duplicados, sin eliminarlos automáticamente.
 
 ## ¿Qué variables tienen más datos ausentes?
 
@@ -74,12 +97,18 @@ knitr::kable(data.frame(
 ```{r fechas}
 fechas <- as.Date(datos$RetractionDate, format = "%m/%d/%Y")
 years <- as.numeric(format(fechas, "%Y"))
-hist(years,
+hist(years[!is.na(years)],
      main = "Retractaciones por año",
      xlab = "Año", ylab = "Frecuencia", col = "lightblue")
 ```
 
-El histograma permite observar la distribución temporal. R puede agrupar varios años en una misma barra.
+## ¿Cómo interpretamos el histograma anterior?
+
+- El eje horizontal representa años o intervalos de años.
+- El eje vertical representa la cantidad de registros.
+- Un pico puede reflejar cambios en la producción científica, la detección o la cobertura de la base.
+
+**No equivale por sí solo a una tasa de retractación.**
 
 ## Disciplinas científicas más frecuentes
 
@@ -124,6 +153,10 @@ barplot(rev(top10_paises), horiz = TRUE, las = 1,
 
 Un mismo artículo puede estar asociado a varios países.
 
+## ¿Por qué separar los países?
+
+Un registro con `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+
 ## Retractaciones por continente
 
 ```{r continentes}
@@ -143,7 +176,8 @@ barplot(rev(frecuencia_continentes$retractaciones), horiz = TRUE,
         xlab = "Número de registros", col = "lightblue")
 ```
 
-Se cuenta una vez cada combinación de título y continente; los títulos no siempre identifican artículos de forma única.
+## ¿Qué podemos concluir de los mapas de frecuencia?
+
 
 ## ¿Qué entendemos por valores atípicos?
 
@@ -170,7 +204,23 @@ knitr::kable(data.frame(
 ))
 ```
 
-Un nombre no siempre equivale a una persona única.
+## ¿Cómo se distribuyen los registros por autor?
+
+```{r distribucion-autores}
+conteos <- table(autores_conteo$num_articulos)
+barplot(head(conteos, 12), col = "lightblue",
+        main = "Autores según número de registros",
+        xlab = "Registros por nombre de autor", ylab = "Número de nombres")
+```
+
+## Cuatro reglas, cuatro criterios
+
+| Regla       | Referencia                | Criterio                            |
+|-----------------|-----------------------|--------------------------------|
+| 3-Sigma     | Media y desviación típica | Distancia mayor que 3 desviaciones  |
+| Hampel      | Mediana y MAD             | Distancia mayor que 3 MAD ajustadas |
+| Boxplot     | Cuartiles e IQR           | Fuera de los límites 1,5 IQR        |
+| Percentiles | Percentiles 5 y 95        | Fuera de ese intervalo              |
 
 ## Aplicación de las cuatro reglas
 
@@ -211,6 +261,19 @@ resumen_outliers <- data.frame(
 knitr::kable(resumen_outliers[, c("Metodo", "Num_Outliers", "Porcentaje")])
 ```
 
+## ¿Qué umbrales obtuvimos?
+
+```{r umbrales-outliers}
+x <- autores_conteo$num_articulos
+tabla_umbrales <- data.frame(
+  Medida = c("Media", "Desviación típica", "Mediana", "MAD ajustada", "Q1", "Q3", "IQR", "Percentil 95"),
+  Valor = round(c(mean(x), sd(x), median(x), mad(x),
+                  unname(quantile(x, .25)), unname(quantile(x, .75)),
+                  IQR(x), unname(quantile(x, .95))), 2)
+)
+knitr::kable(tabla_umbrales)
+```
+
 ## Comparación visual de métodos
 
 ```{r grafico-outliers}
@@ -221,9 +284,19 @@ barplot(resumen_outliers$Porcentaje,
         ylab = "Porcentaje (%)")
 ```
 
-Los métodos no tienen por qué identificar a los mismos autores.
+## ¿Coinciden los métodos?
 
-## Precauciones al interpretar los outliers
+```{r coincidencia-metodos}
+coincidencias <- autores_analisis %>%
+  mutate(Num_metodos = rowSums(across(starts_with("Es_")), na.rm = TRUE)) %>%
+  count(Num_metodos, name = "Nombres")
+barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
+        col = "lightpink", main = "Coincidencia entre reglas",
+        xlab = "Número de reglas que detectan el nombre",
+        ylab = "Número de nombres")
+```
+
+## Interpretación de los outliers
 
 Si muchos autores tienen exactamente un registro, la **MAD** o el **IQR** pueden ser cero. En ese caso, Hampel y Boxplot pueden clasificar como atípicos todos los valores superiores a uno.
 

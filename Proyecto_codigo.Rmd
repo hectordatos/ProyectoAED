@@ -105,7 +105,7 @@ hist(years,
      main = "Retractaciones por año",
      xlab = "Año",
      ylab = "Frecuencia",
-     col = "lightgreen")
+     col =  "lightgreen")
 ```
 
 \endgroup
