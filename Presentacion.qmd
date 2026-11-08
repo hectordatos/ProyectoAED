@@ -178,10 +178,9 @@ barplot(rev(frecuencia_continentes$retractaciones), horiz = TRUE,
 
 ## ¿Qué podemos concluir de los mapas de frecuencia?
 
+## ¿Qué entendemos por valores atípicos(outliers)?
 
-## ¿Qué entendemos por valores atípicos?
-
-Estudiamos el **número de registros asociados a cada nombre de autor**. Comparamos cuatro reglas de detección:
+Un outlier es una observación que no parece consistente con el resto de valores de esa variable. Estudiamos el **número de registros asociados a cada nombre de autor**. Comparamos cuatro reglas de detección:
 
 - **3-Sigma:** distancia respecto a la media.
 - **Hampel:** distancia respecto a la mediana y MAD.
@@ -189,6 +188,8 @@ Estudiamos el **número de registros asociados a cada nombre de autor**. Compara
 - **Percentil:** valores fuera de los percentiles 5 y 95.
 
 ## Preparación de los recuentos por autor
+
+Obtenemos un dataframede los autores junto con el recuento individual de sus retractaciones, ordenada con los autores más frecuentemente retractados en las primeras filas.
 
 ```{r autores}
 autores_conteo <- datos %>%
@@ -204,7 +205,11 @@ knitr::kable(data.frame(
 ))
 ```
 
+Generamos una tabla de la distribución de retractaciones por autor.
+
 ## ¿Cómo se distribuyen los registros por autor?
+
+Calculamos la distribución de frecuencias del número de retractaciones y generamos un gráfico de barras con los 12 primeros valores.
 
 ```{r distribucion-autores}
 conteos <- table(autores_conteo$num_articulos)
@@ -213,16 +218,20 @@ barplot(head(conteos, 12), col = "lightblue",
         xlab = "Registros por nombre de autor", ylab = "Número de nombres")
 ```
 
-## Cuatro reglas, cuatro criterios
+## Cuatro reglas, cuatro criterios.
+
+Tenemos 4 criterios diferentes para obtener los ouliers o datos atípicos.
 
 | Regla       | Referencia                | Criterio                            |
-|-----------------|-----------------------|--------------------------------|
+|------------------|-----------------------|-------------------------------|
 | 3-Sigma     | Media y desviación típica | Distancia mayor que 3 desviaciones  |
 | Hampel      | Mediana y MAD             | Distancia mayor que 3 MAD ajustadas |
 | Boxplot     | Cuartiles e IQR           | Fuera de los límites 1,5 IQR        |
 | Percentiles | Percentiles 5 y 95        | Fuera de ese intervalo              |
 
 ## Aplicación de las cuatro reglas
+
+Definimos 4 funciones, una función para cada regla.
 
 ```{r calculo-outliers}
 reglasigma <- function(x) {
