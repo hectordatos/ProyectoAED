@@ -140,6 +140,18 @@ knitr::kable(tabla_subject)%>%
   kable_styling(font_size = 26)
 ```
 
+## ¿Por qué separar los países?
+
+Un registro como `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+```{r}
+#| echo: true
+# Separamos los países concatenados para no contar combinaciones como un solo país.
+paises_limpios <- datos %>%
+  separate_longer_delim(Country, delim = ";") %>%
+  mutate(Country = trimws(Country)) %>%
+  filter(!is.na(Country), Country != "")
+```
+
 ## Países con más registros
 
 ```{r paises}
@@ -158,19 +170,6 @@ barplot(rev(top10_paises), horiz = TRUE, las = 1,
 ```
 
 Un mismo artículo puede estar asociado a varios países.
-
-## ¿Por qué separar los países?
-
-Un registro como `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
-```{r}
-#| echo: true
-# Separamos los países concatenados para no contar combinaciones como un solo país.
-paises_limpios <- datos %>%
-  separate_longer_delim(Country, delim = ";") %>%
-  mutate(Country = trimws(Country)) %>%
-  filter(!is.na(Country), Country != "")
-```
-
 
 ## Retractaciones por continente
 
