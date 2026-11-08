@@ -77,6 +77,8 @@ colMeans(is.na(datos))*100 #Porcentaje de NA
 
 # Valores duplicados
 sum(duplicated(datos))
+# Artículos duplicados con el mismo DOI
+sum(duplicated(datos$OriginalPaperDOI))
 ```
 
 \endgroup
@@ -97,12 +99,15 @@ barplot(table(datos$RetractionDate))
 head(datos$RetractionDate)
 # Convertimos la variable a formato fecha
 fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
-# Creamos el histograma
-hist(as.numeric(fechas),
-     main = "Distribución de las fechas de retractación",
-     xlab = "Fecha",
+# Extraemos los años para que el plot quede más limpio
+years <- as.numeric(format(fechas, "%Y"))
+
+# Creamos el histograma de retracciones por año
+hist(years,
+     main = "Retractaciones por año",
+     xlab = "Año",
      ylab = "Frecuencia",
-     xaxt = "n")
+     col = "lightblue")
 # Personalizamos el eje X para mostrar fechas
 fechas_eje <- pretty(range(fechas, na.rm = TRUE))
 
@@ -203,6 +208,7 @@ frecuencia_continentes <- datos_clean %>%
 
 # Ajustar márgenes para que quepan las etiquetas verticales
 par(mar = c(7, 6, 4, 2))
+
 # Dibujar el gráfico de barras 
 bp <- barplot(frecuencia_continentes$retractaciones,
               las = 1,                                      # Orientación horizontal para los números del eje Y
@@ -224,7 +230,7 @@ axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 
 ```{r analisis-outliers}
 library(tidyverse)
 
-# Separar autores y contar frecuencias.
+# Separar autores y contar frecuencias
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
   mutate(Author = str_trim(Author)) %>%
@@ -264,6 +270,7 @@ autores_analisis <- autores_conteo %>%
     Es_Boxplot   = reglaboxplot(num_articulos),
     Es_Percentil = reglapercentil(num_articulos)
   )
+
 # Cálculo de totales y probabilidades por método
 total_autores <- nrow(autores_analisis)
 
