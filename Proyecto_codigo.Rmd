@@ -1,13 +1,14 @@
 ---
-title: "Proyecto_final_codigo"
-author: 
-  - "Miriam Caballero Cervero" 
+title: "Análisis exploratorio de artículos científicos retractados"
+author:
+  - "Miriam Caballero Cervero"
   - "Héctor García Díez"
 date: "2026-11-02"
-output: 
+output:
   pdf_document:
     latex_engine: xelatex
-    pandoc_args: ["-V", "fontsize=6pt"]
+fontsize: 6pt
+geometry: margin=2.0cm
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +16,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   fig.width = 5,
   fig.height = 3,
-  out.width = "45%",
+  out.width = "40%",
   size = "scriptsize"
 )
 ```
@@ -96,18 +97,15 @@ barplot(table(datos$RetractionDate))
 head(datos$RetractionDate)
 # Convertimos la variable a formato fecha
 fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
-# Creamos el histograma
-hist(as.numeric(fechas),
-     main = "Distribución de las fechas de retractación",
-     xlab = "Fecha",
-     ylab = "Frecuencia",
-     xaxt = "n")
-# Personalizamos el eje X para mostrar fechas
-fechas_eje <- pretty(range(fechas, na.rm = TRUE))
+# Extraemos los años para que el plot quede más limpio
+years <- as.numeric(format(fechas, "%Y"))
 
-axis(1,
-     at = as.numeric(fechas_eje),
-     labels = format(fechas_eje, "%m/%d/%Y"))
+# Creamos el histograma de retracciones por año
+hist(years,
+     main = "Retractaciones por año",
+     xlab = "Año",
+     ylab = "Frecuencia",
+     col =  "lightgreen")
 ```
 
 \endgroup
@@ -129,8 +127,7 @@ knitr::kable(head(freq_subject, 10))
 knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
 
 # Seleccionamos las 10 disciplinas más frecuentes
-freq <- sort(freq_subject, decreasing = TRUE) 
-top10_subject <- head(freq, 10)
+top10_subject <- head(freq_subject, 10)
 top10_subject
 
 # Representamos las 10 disciplinas más frecuentes con nombres abreviados
@@ -202,6 +199,7 @@ frecuencia_continentes <- datos_clean %>%
 
 # Ajustar márgenes para que quepan las etiquetas verticales
 par(mar = c(7, 6, 4, 2))
+
 # Dibujar el gráfico de barras 
 bp <- barplot(frecuencia_continentes$retractaciones,
               las = 1,                                      # Orientación horizontal para los números del eje Y
@@ -223,7 +221,7 @@ axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 
 ```{r analisis-outliers}
 library(tidyverse)
 
-# Separar autores y contar frecuencias.
+# Separar autores y contar frecuencias
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
   mutate(Author = str_trim(Author)) %>%
@@ -263,6 +261,7 @@ autores_analisis <- autores_conteo %>%
     Es_Boxplot   = reglaboxplot(num_articulos),
     Es_Percentil = reglapercentil(num_articulos)
   )
+
 # Cálculo de totales y probabilidades por método
 total_autores <- nrow(autores_analisis)
 

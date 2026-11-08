@@ -1,263 +1,314 @@
 ---
-title: "Análisis exploratorio de retractaciones científicas"
-author: 
-  - "Miriam Caballero Cerveró"
+title: "Análisis exploratorio de artículos científicos retractados"
+author:
+  - "Miriam Caballero Cervero"
   - "Héctor García Díez"
+date: "2026-11-02"
 format:
   revealjs:
     theme: simple
-    slide-number: true
+    slide-level: 2
     transition: slide
-execute: 
-  echo: false
-  message: false
-  fig-width: 11
-  fig-height: 6
-  out-width: "95%"
-editor: visual
+    center: false
+    embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## 
-
-## Leer los datos
-
-\begingroup 
-\scriptsize
-
-```{r carga-datos}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 5, out.width = "90%")
+library(dplyr)
+library(tidyr)
+library(countrycode)
 datos <- read.csv("data/retractions.csv")
 ```
 
-\endgroup
+## ¿Por qué estudiar las retractaciones?
 
-# Análisis previo de los datos
+Una **retractación** es una retirada formal de un artículo del registro científico. Puede producirse por errores, problemas metodológicos u otras razones.
 
-## Análisis inicial
+**Pregunta central:** ¿cómo ha evolucionado el número de retracciones científicas a lo largo de los años y dependiendo de distintas variables como la discilplina o el país, etc.?
 
-\begingroup 
-\scriptsize
+## Objetivos y recorrido
 
-```{r tablas, warning=FALSE}
-View(datos)
+1.  Conocer la base de datos y su calidad.
+2.  Describir la evolución temporal y las áreas científicas.
+3.  Comparar países y continentes.
+4.  Estudiar autores y contrastar cuatro reglas de valores atípicos.
+5.  Discutir las limitaciones.
 
-# head(datos): Muestra las primeras 6 filas para revisar los encabezados y datos iniciales 
-head(datos)
+## ¿Qué vamos a estudiar?
 
-# tail(datos): Muestra las últimas 6 filas para comprobar que el archivo cargó completo y sin errores
-tail(datos) 
+Analizamos los registros de artículos científicos retractados para conocer su distribución por **fecha, disciplina, país y continente**, y detectar recuentos atípicos por autor.
 
-# dim(datos): devuelve el número de filas y columnas del dataframe.
-dim(datos)
+## ¿Qué significa cada variable?
 
-# Nombres de las columnas(nombre de las variables)
-names(datos)
+| Variable           | Qué representa                                     |
+|--------------------|----------------------------------------------------|
+| `Title`            | Título del trabajo                                 |
+| `OriginalPaperDOI` | Identificador del artículo original, cuando existe |
+| `RetractionDate`   | Fecha de retractación                              |
+| `Subject`          | Temática o conjunto de temáticas                   |
+| `Country`          | País o países asociados                            |
+| `Author`           | Autor o autores indicados                          |
 
-# Número de valores distintos de cada variable
-sapply(datos, function(x) length(unique(x)))
+## Lectura y estructura de los datos
 
-# str(datos): Muestra la estructura general (filas, columnas, tipos de datos y primeros valores)
-str(datos)
-
-# summary(datos): Genera el resumen estadístico (mín, media, máx y NAs en números; tipo y dimensión en texto)
-summary(datos)
+```{r estructura}
+resumen <- data.frame(
+  Indicador = c("Registros", "Variables", "Valores distintos de Subject"),
+  Valor = c(nrow(datos), ncol(datos), length(unique(datos$Subject)))
+)
+knitr::kable(resumen)
 ```
 
-\endgroup
+Cada fila representa un registro de la base de datos. El número de valores distintos de `Subject` puede incluir combinaciones de disciplinas.
 
-## Identificar valores perdidos y duplicados
+## Calidad de los datos
 
-\begingroup 
-\scriptsize
-
-```{r valores_perdidos}
-# Valores perdidos
-sum(is.na(datos)) #Total de NA
-colSums(is.na(datos)) #NA por columna 
-colMeans(is.na(datos))*100 #Porcentaje de NA
-
-# Valores duplicados
-sum(duplicated(datos))
+```{r valores-perdidos}
+doi <- trimws(as.character(datos$OriginalPaperDOI))
+doi <- doi[!is.na(doi) & doi != ""]
+calidad <- data.frame(
+  Indicador = c("Celdas con NA", "Filas duplicadas", "DOI repetidos (no vacíos)"),
+  Total = c(sum(is.na(datos)), sum(duplicated(datos)), sum(duplicated(doi)))
+)
+knitr::kable(calidad)
 ```
 
-\endgroup
+## ¿Por qué revisamos los duplicados?
 
-## Analizamos las variables categóricas
+- Dos filas idénticas pueden indicar un registro repetido.
+- Un DOI repetido **no siempre** significa un duplicado: hay que revisar el contexto.
+- Un DOI ausente o vacío no identifica ningún artículo.
 
-\begingroup 
-\scriptsize
+**Decisión:** describimos los posibles duplicados, sin eliminarlos automáticamente.
 
-```{r variables-categoricas}
-head(sort(table(datos$Subject), decreasing = TRUE), 10) #Vemos las frecuencias por temática científica
-head(sort(prop.table(table(datos$Subject)), decreasing =TRUE), 10) #tabla para saber qué temática científica es más frecuente
-#Representamos los datos para visualizarlos mejor
-barplot(table(datos$Subject))
+## ¿Qué variables tienen más datos ausentes?
 
-barplot(table(datos$RetractionDate))
-#Vemos el formato de las fechas para especificarlo más abajo
-head(datos$RetractionDate)
-# Convertimos la variable a formato fecha
-fechas <- as.Date(datos$RetractionDate, format="%m/%d/%Y")
-# Creamos el histograma
-hist(as.numeric(fechas),
-     main = "Distribución de las fechas de retractación",
-     xlab = "Fecha",
-     ylab = "Frecuencia",
-     xaxt = "n")
-# Personalizamos el eje X para mostrar fechas
-fechas_eje <- pretty(range(fechas, na.rm = TRUE))
-
-axis(1,
-     at = as.numeric(fechas_eje),
-     labels = format(fechas_eje, "%m/%d/%Y"))
+```{r porcentaje-na}
+porcentajes_na <- sort(colMeans(is.na(datos)) * 100, decreasing = TRUE)
+knitr::kable(data.frame(
+  Variable = names(head(porcentajes_na, 8)),
+  Porcentaje_NA = round(as.numeric(head(porcentajes_na, 8)), 2)
+))
 ```
 
-\endgroup
+## Retractaciones a lo largo del tiempo
 
-## Análisis de las disciplinas científicas
+```{r fechas}
+fechas <- as.Date(datos$RetractionDate, format = "%m/%d/%Y")
+years <- as.numeric(format(fechas, "%Y"))
+hist(years[!is.na(years)],
+     main = "Retractaciones por año",
+     xlab = "Año", ylab = "Frecuencia", col = "lightblue")
+```
 
-\begingroup 
-\scriptsize
+## ¿Cómo interpretamos el histograma anterior?
 
-```{r disciplinas-cientificas}
-# Número de disciplinas diferentes (solo la cabecera, solo 10 disciplinas diferentes)
-head(unique(datos$Subject), 10)
-length(unique(datos$Subject)) # Tenemos 12575 disciplinas
+- El eje horizontal representa años o intervalos de años.
+- El eje vertical representa la cantidad de registros.
+- Un pico puede reflejar cambios en la producción científica, la detección o la cobertura de la base.
 
-#Frecuencias absolutas y relativas 
+**No equivale por sí solo a una tasa de retractación.**
+
+## Disciplinas científicas más frecuentes
+
+```{r disciplinas}
 freq_subject <- sort(table(datos$Subject), decreasing = TRUE)
-knitr::kable(head(freq_subject, 10))
-
-knitr::kable(head(prop.table(freq_subject)*100, 10)) # Frecuencias relativas en porcentaje
-
-# Seleccionamos las 10 disciplinas más frecuentes
-freq <- sort(freq_subject, decreasing = TRUE) 
-top10_subject <- head(freq, 10)
-top10_subject
-
-# Representamos las 10 disciplinas más frecuentes con nombres abreviados
-barplot(top10_subject,
-        horiz = TRUE,
-        las = 1,
-        names.arg = abbreviate(names(top10_subject), minlength = 6),
-        main = "Top 10 disciplinas científicas",
-        xlab = "Frecuencia",
-        col = "lightpink")
+top10_subject <- head(freq_subject, 10)
+par(mar = c(5, 9, 3, 1))
+barplot(rev(top10_subject), horiz = TRUE, las = 1,
+        names.arg = abbreviate(rev(names(top10_subject)), minlength = 10),
+        main = "Top 10 categorías de Subject", xlab = "Frecuencia", col = "lightpink")
 ```
 
-\endgroup
+Las categorías se cuentan tal como aparecen en la columna `Subject`.
 
-## Análisis de los países
+## Frecuencias relativas de las disciplinas
 
-\begingroup 
-\scriptsize
+```{r frecuencias-subject}
+tabla_subject <- data.frame(
+  Categoria = abbreviate(names(top10_subject), minlength = 15),
+  Frecuencia = as.numeric(top10_subject),
+  Porcentaje = round(100 * as.numeric(top10_subject) / sum(freq_subject), 2)
+)
+knitr::kable(tabla_subject)
+```
+
+## Países con más registros
 
 ```{r paises}
-# Calculamos las frecuencias absolutas por país
-paises <- sort(table(datos$Country), decreasing = TRUE)
-
-# Seleccionamos los 10 países más frecuentes
+# Separamos los países concatenados para no contar combinaciones como un solo país.
+paises_limpios <- datos %>%
+  separate_longer_delim(Country, delim = ";") %>%
+  mutate(Country = trimws(Country)) %>%
+  filter(!is.na(Country), Country != "")
+paises <- sort(table(paises_limpios$Country), decreasing = TRUE)
 top10_paises <- head(paises, 10)
-
-# Cambiar nombres de los países
-library(dplyr)
-
-names(top10_paises) <- recode(names(top10_paises),"United Kingdom" = "UK","United States" = "US","South Korea" = "SK")
-
-# Representamos los países más frecuentes
-barplot(top10_paises,
-        las = 2,
-        main = "Top 10 países",
-        ylab = "Frecuencia",
-        col = "lightblue")
-
+names(top10_paises) <- dplyr::recode(names(top10_paises),
+  "United Kingdom" = "UK", "United States" = "US", "South Korea" = "SK")
+par(mar = c(5, 8, 3, 1))
+barplot(rev(top10_paises), horiz = TRUE, las = 1,
+        main = "Top 10 países", xlab = "Frecuencia", col = "lightblue")
 ```
 
-\endgroup
+Un mismo artículo puede estar asociado a varios países.
 
-## Análisis por continente
+## ¿Por qué separar los países?
 
-\begingroup 
-\scriptsize
+Un registro con `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+
+## Retractaciones por continente
 
 ```{r continentes}
-library(countrycode)
-library(dplyr)
-library(tidyr)
-
-# Separar los países concatenados por ';'
 datos_new <- datos %>%
-  separate_longer_delim(Country, delim = ";") %>% 
-  mutate(Country = trimws(Country))
-
-# Asignar continente
-datos_new <- datos_new %>%
-  mutate(Continent = countrycode(Country, origin = "country.name", destination = "continent"))
-
-# Eliminar duplicados dentro del mismo (artículo, continente)
+  separate_longer_delim(Country, delim = ";") %>%
+  mutate(Country = trimws(Country),
+         Continent = countrycode(Country, origin = "country.name", destination = "continent"))
 datos_clean <- datos_new %>%
-  filter(!is.na(Continent)) %>%         
-  distinct(Title, Continent, .keep_all = TRUE) # Cambia 'id' por el identificador de tu artículo
-
-# Contar el número total de artículos por continente
+  filter(!is.na(Continent)) %>%
+  distinct(Title, Continent, .keep_all = TRUE)
 frecuencia_continentes <- datos_clean %>%
   count(Continent, sort = TRUE, name = "retractaciones")
-
-# Ajustar márgenes para que quepan las etiquetas verticales
-par(mar = c(7, 6, 4, 2))
-
-# Dibujar el gráfico de barras 
-bp <- barplot(frecuencia_continentes$retractaciones,
-              las = 1,                                      # Orientación horizontal para los números del eje Y
-              main = "Artículos retractados por continente",
-              ylab = "Número de artículos",
-              mgp = c(4.5, 1, 0),                           # Aleja la etiqueta Número de artículos para que no solape
-              col = "lightblue")
-
-axis(1, at = bp, labels = frecuencia_continentes$Continent, las = 1, cex.axis = 0.8)
+par(mar = c(5, 8, 3, 1))
+barplot(rev(frecuencia_continentes$retractaciones), horiz = TRUE,
+        names.arg = rev(frecuencia_continentes$Continent), las = 1,
+        main = "Artículos retractados por continente",
+        xlab = "Número de registros", col = "lightblue")
 ```
 
-\endgroup
+## ¿Qué podemos concluir de los mapas de frecuencia?
 
-## Estudio de valores atípicos/outliers.
 
-\begingroup 
-\scriptsize
+## ¿Qué entendemos por valores atípicos?
 
-```{r analisis-outliers}
-library(tidyverse)
+Estudiamos el **número de registros asociados a cada nombre de autor**. Comparamos cuatro reglas de detección:
 
-# Separar autores y contar frecuencias
+- **3-Sigma:** distancia respecto a la media.
+- **Hampel:** distancia respecto a la mediana y MAD.
+- **Boxplot:** límites basados en el rango intercuartílico.
+- **Percentil:** valores fuera de los percentiles 5 y 95.
+
+## Preparación de los recuentos por autor
+
+```{r autores}
 autores_conteo <- datos %>%
   separate_rows(Author, sep = ";") %>%
-  mutate(Author = str_trim(Author)) %>%
-  filter(Author != "" & !is.na(Author)) %>%
+  mutate(Author = trimws(Author)) %>%
+  filter(!is.na(Author), Author != "") %>%
   count(Author, name = "num_articulos") %>%
   arrange(desc(num_articulos))
-
-# Cálculo de valores atípicos (método IQR)
-q1 <- quantile(autores_conteo$num_articulos, 0.25)
-q3 <- quantile(autores_conteo$num_articulos, 0.75)
-umbral_outlier <- q3 + 1.5 * (q3 - q1)
-
-# Filtrar outliers 
-outliers_autores <- autores_conteo %>%
-  filter(num_articulos > umbral_outlier)
-
-# Número de datos atípicos
-num_outliers <- nrow(outliers_autores)
-num_outliers
-
-# Número de autores total
-total_autores <- nrow(autores_conteo)
-total_autores
-
-# Cálculo de la probabilidad (proporción)
-prob_outliers <- num_outliers / total_autores
-prob_outliers
+knitr::kable(data.frame(
+  Indicador = c("Nombres distintos", "Mediana de registros", "Máximo de registros"),
+  Valor = c(nrow(autores_conteo), median(autores_conteo$num_articulos),
+            max(autores_conteo$num_articulos))
+))
 ```
 
-\endgroup
+## ¿Cómo se distribuyen los registros por autor?
+
+```{r distribucion-autores}
+conteos <- table(autores_conteo$num_articulos)
+barplot(head(conteos, 12), col = "lightblue",
+        main = "Autores según número de registros",
+        xlab = "Registros por nombre de autor", ylab = "Número de nombres")
+```
+
+## Cuatro reglas, cuatro criterios
+
+| Regla       | Referencia                | Criterio                            |
+|-----------------|-----------------------|--------------------------------|
+| 3-Sigma     | Media y desviación típica | Distancia mayor que 3 desviaciones  |
+| Hampel      | Mediana y MAD             | Distancia mayor que 3 MAD ajustadas |
+| Boxplot     | Cuartiles e IQR           | Fuera de los límites 1,5 IQR        |
+| Percentiles | Percentiles 5 y 95        | Fuera de ese intervalo              |
+
+## Aplicación de las cuatro reglas
+
+```{r calculo-outliers}
+reglasigma <- function(x) {
+  mu <- mean(x, na.rm = TRUE)
+  sigma <- sd(x, na.rm = TRUE)
+  abs(x - mu) > 3 * sigma
+}
+reglahampel <- function(x) {
+  med <- median(x, na.rm = TRUE)
+  v_mad <- 1.4826 * median(abs(x - med), na.rm = TRUE)
+  abs(x - med) > 3 * v_mad
+}
+reglaboxplot <- function(x) {
+  q <- quantile(x, probs = c(0.25, 0.75), na.rm = TRUE)
+  iqr <- q[2] - q[1]
+  x < (q[1] - 1.5 * iqr) | x > (q[2] + 1.5 * iqr)
+}
+reglapercentil <- function(x) {
+  p <- quantile(x, probs = c(0.05, 0.95), na.rm = TRUE)
+  x < p[1] | x > p[2]
+}
+autores_analisis <- autores_conteo %>%
+  mutate(Es_Sigma = reglasigma(num_articulos),
+         Es_Hampel = reglahampel(num_articulos),
+         Es_Boxplot = reglaboxplot(num_articulos),
+         Es_Percentil = reglapercentil(num_articulos))
+total_autores <- nrow(autores_analisis)
+resumen_outliers <- data.frame(
+  Metodo = c("3-Sigma", "Hampel", "Boxplot", "Percentil"),
+  Num_Outliers = c(sum(autores_analisis$Es_Sigma, na.rm = TRUE),
+                   sum(autores_analisis$Es_Hampel, na.rm = TRUE),
+                   sum(autores_analisis$Es_Boxplot, na.rm = TRUE),
+                   sum(autores_analisis$Es_Percentil, na.rm = TRUE))
+) %>% mutate(Proporcion = Num_Outliers / total_autores,
+             Porcentaje = round(100 * Proporcion, 2))
+knitr::kable(resumen_outliers[, c("Metodo", "Num_Outliers", "Porcentaje")])
+```
+
+## ¿Qué umbrales obtuvimos?
+
+```{r umbrales-outliers}
+x <- autores_conteo$num_articulos
+tabla_umbrales <- data.frame(
+  Medida = c("Media", "Desviación típica", "Mediana", "MAD ajustada", "Q1", "Q3", "IQR", "Percentil 95"),
+  Valor = round(c(mean(x), sd(x), median(x), mad(x),
+                  unname(quantile(x, .25)), unname(quantile(x, .75)),
+                  IQR(x), unname(quantile(x, .95))), 2)
+)
+knitr::kable(tabla_umbrales)
+```
+
+## Comparación visual de métodos
+
+```{r grafico-outliers}
+barplot(resumen_outliers$Porcentaje,
+        names.arg = resumen_outliers$Metodo,
+        col = "lightpink", las = 1,
+        main = "Autores clasificados como atípicos",
+        ylab = "Porcentaje (%)")
+```
+
+## ¿Coinciden los métodos?
+
+```{r coincidencia-metodos}
+coincidencias <- autores_analisis %>%
+  mutate(Num_metodos = rowSums(across(starts_with("Es_")), na.rm = TRUE)) %>%
+  count(Num_metodos, name = "Nombres")
+barplot(coincidencias$Nombres, names.arg = coincidencias$Num_metodos,
+        col = "lightpink", main = "Coincidencia entre reglas",
+        xlab = "Número de reglas que detectan el nombre",
+        ylab = "Número de nombres")
+```
+
+## Interpretación de los outliers
+
+Si muchos autores tienen exactamente un registro, la **MAD** o el **IQR** pueden ser cero. En ese caso, Hampel y Boxplot pueden clasificar como atípicos todos los valores superiores a uno.
+
+Un valor atípico **no demuestra una irregularidad científica**: solo indica un recuento poco habitual según una regla estadística.
+
+## Conclusiones
+
+- Hemos explorado la estructura y la calidad de los datos.
+- Hemos descrito las retractaciones por fecha, temática y ubicación geográfica.
+- Hemos comparado cuatro métodos de detección de valores atípicos.
+- Los recuentos no deben confundirse con tasas de retractación ni con evidencia de mala conducta.
+
+## Muchas gracias
+
+**¿Alguna pregunta?**
