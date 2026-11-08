@@ -142,7 +142,7 @@ knitr::kable(tabla_subject)%>%
 
 ## Estudio de los paises
 
-Un registro como `Spain; France` está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto.
+En la variable Paises podemos tener un valor que sea más de un país y se registre como `Spain; France` que está asociado a dos países. Si no separamos la celda, R contaría esa combinación como un país distinto. Aquí podemos ver el código.
 
 ```{r}
 #| echo: true
